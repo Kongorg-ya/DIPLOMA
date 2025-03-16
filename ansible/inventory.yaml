@@ -1,0 +1,32 @@
+---
+linux: #Группа хостов 
+  children: #Обозначение, что будет подгруппа хостов
+    nginx_proxy: #Имя подгруппы хостов балансировщика
+      hosts: #Узлы группы
+        balance-server: #Имя машины
+          ansible_host: 51.250.95.162 #Адрес машины
+    nginx_custom: #Имя подгруппы хостов серверов приложения
+      hosts: #Узлы группы
+        mediawiki-node1:
+          ansible_host: 158.160.102.117
+        mediawiki-node2:
+          ansible_host: 158.160.109.140
+    psql_cluster: #Имя подгруппы хостов кластера БД
+      hosts: #Узлы группы
+        postgresql-master:
+          ansible_host: 158.160.101.20
+        postgresql-slave:
+          ansible_host: 51.250.83.79
+    monitoring: #Имя подгруппы хостов мониторинга
+      hosts: #Узлы группы
+        zabbix:
+          ansible_host: 158.160.108.253
+    backup: #Имя подгруппы хостов мониторинга
+      hosts: #Узлы группы
+        backup-fs:
+          ansible_host: 89.169.143.34
+
+
+  vars: #Переменные, доступные или используемые для всех подгрупп
+    ansible_user: "root"
+    ansible_become: false #Становиться ли другим пользователем после подключения

@@ -1,0 +1,14 @@
+--- 
+- name: Установка и настройка nginx c кастомной страницей
+  hosts: nginx_custom # Будет работать на узлах в группе nginx_custom
+  roles:
+    - role: nginx_custom
+  tags:
+    - nginx_custom
+
+- name: Настройка проксирующего сервера
+  hosts: nginx_proxy # Будет работать на узлах в группе nginx_custom
+  roles:
+    - role: nginx_proxy
+  tags:
+    - nginx_proxy
