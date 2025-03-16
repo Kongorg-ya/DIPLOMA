@@ -12,3 +12,10 @@
     - role: nginx_proxy
   tags:
     - nginx_proxy
+
+- name: Установка и настройка кластера БД
+  hosts: psql_cluster # Будет работать на узлах в группе nginx_custom
+  roles:
+    - role: psql_cluster
+  tags:
+    - psql_cluster

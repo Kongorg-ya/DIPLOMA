@@ -1,0 +1,11 @@
+---
+# tasks file for psql_cluster
+- name: Меняем имя машины
+  shell: "echo {{ inventory_hostname }} > /etc/hostname"
+  when: "inventory_hostname != ansible_hostname"
+
+- name: установка postgresql
+  apt:
+    name: "postgresql"
+    state: present
+  notify: "PSQL Reloader"
