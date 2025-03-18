@@ -14,3 +14,4 @@
     src: index.j2
     dest: /var/www/html/index.nginx-debian.html
   notify: "Nginx Reloader"
+

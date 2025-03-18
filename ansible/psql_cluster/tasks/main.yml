@@ -9,3 +9,31 @@
     name: "postgresql"
     state: present
   notify: "PSQL Reloader"
+  
+- name: "Start and enable services"
+  service: "name={{ item }} state=started enabled=yes"
+  with_items:
+    - postgresql
+  
+- name: настройка postgresql.conf на мастер ноде
+  ansible.builtin.template:
+    src: postgresql_master_conf.j2
+    dest: /etc/postgresql/14/main/postgresql.conf
+  when: "'postgresql-master' in inventory_hostname"
+  notify: "PSQL Reloader" 
+  
+- name: настройка postgresql.conf на реплика ноде
+  ansible.builtin.template:
+    src: postgresql_slave_conf.j2
+    dest: /etc/postgresql/14/main/postgresql.conf
+  when: "'postgresql-slave' in inventory_hostname"
+  notify: "PSQL Reloader" 
+  
+- name: настройка pg_hba.conf на мастер ноде
+  ansible.builtin.template:
+    src: pg_hba_conf.j2
+    dest: /etc/postgresql/14/main/pg_hba.conf
+  when: "'postgresql-master' in inventory_hostname"
+  notify: "PSQL Reloader" 
+  
+

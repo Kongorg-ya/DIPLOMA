@@ -1,0 +1,31 @@
+---
+# tasks file for replica
+- name: настройка postgresql - создание пользователя репликации
+  ansible.builtin.expect:
+    command: sudo -u postgres createuser --replication -P syncuser
+    responses:
+      Enter password for new role: "12345678"
+      Enter it again: "12345678"
+  when: "'postgresql-master' in inventory_hostname"
+  failed_when: false
+#  notify: "PSQL Reloader"
+
+- name: Останавливаем сервис и удаляем базы из папки хранения на ноде репликации
+  ansible.builtin.command: "{{ item }}"
+  with_items:
+    - sudo systemctl stop postgresql
+    - sudo -u postgres rm -rf /var/lib/postgresql/14/main/
+  when: "'postgresql-slave' in inventory_hostname"
+
+- name: настройка postgresql - создание репликации
+  ansible.builtin.expect:
+    command: sudo -u postgres pg_basebackup -h 192.168.10.15 -D /var/lib/postgresql/14/main -U syncuser -P -v -R
+    responses:
+      Password: "12345678"
+  when: "'postgresql-slave' in inventory_hostname"
+  
+- name: Запускаем сервис на ноде репликации
+  ansible.builtin.command: "{{ item }}"
+  with_items:
+    - sudo systemctl start postgresql
+  when: "'postgresql-slave' in inventory_hostname"

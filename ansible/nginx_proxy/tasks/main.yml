@@ -13,5 +13,5 @@
   ansible.builtin.template:
     src: proxy_conf.j2
     dest: /etc/nginx/sites-available/default
-  when: "'balance-server' in inventory_hostname" # Выполнится только тогда, когда в имени есть vm_1
+  when: "'balance-server' in inventory_hostname" # Выполнится только тогда, когда в имени есть balance-server
   notify: "Nginx Reloader"

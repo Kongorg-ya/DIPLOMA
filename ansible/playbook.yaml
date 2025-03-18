@@ -7,15 +7,22 @@
     - nginx_custom
 
 - name: Настройка проксирующего сервера
-  hosts: nginx_proxy # Будет работать на узлах в группе nginx_custom
+  hosts: nginx_proxy # Будет работать на узлах в группе nginx_proxy
   roles:
     - role: nginx_proxy
   tags:
     - nginx_proxy
 
 - name: Установка и настройка кластера БД
-  hosts: psql_cluster # Будет работать на узлах в группе nginx_custom
+  hosts: psql_cluster # Будет работать на узлах в группе psql_cluster
   roles:
     - role: psql_cluster
   tags:
     - psql_cluster
+
+- name: Настройка репликации кластера БД
+  hosts: psql_cluster # Будет работать на узлах в группе psql_cluster
+  roles:
+    - role: replica
+  tags:
+    - replica
