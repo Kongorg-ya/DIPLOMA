@@ -3,15 +3,55 @@
 - name: Меняем имя машины
   shell: "echo {{ inventory_hostname }} > /etc/hostname"
   when: "inventory_hostname != ansible_hostname"
+  
+- name: Обновление пакетов
+  ansible.builtin.command: "{{ item }}"
+  with_items:
+    - sudo apt-get update -y
+  failed_when: false
 
-- name: Установка Nginx
+- name: Установка Nginx и необходимых пакетов
   apt:
-    name: "nginx"
+    name: "{{ item }}"
     state: present
+  loop:
+    - "{{ packages_to_install }}"
 
-- name: Подмена веб-страницы
-  ansible.builtin.template:
-    src: index.j2
-    dest: /var/www/html/index.nginx-debian.html
+- name: Копируем файлы MediaWiki на удаленный веб-сервер
+  copy:
+    src: /home/kongorg/ansible/mediawiki-1.42.1.tar.gz    # note the '/' <-- !!!
+    dest: /tmp
+  
+- name: Распаковываем архив на удаленной машине
+  ansible.builtin.command: "{{ item }}"
+  with_items:
+    - tar -xvf /tmp/mediawiki-1.42.1.tar.gz -C /tmp
+    - sudo mv /tmp/mediawiki-1.42.1 /var/www/mediawiki
+    - sudo chown -R www-data:www-data /var/www/mediawiki
+    - sudo chmod -R 755 /var/www/mediawiki
+  failed_when: false
+  
+- name: Копируем файл LocalSettings на удаленный веб-сервер
+  copy:
+    src: /home/kongorg/ansible/LocalSettings_node1.php    # note the '/' <-- !!!
+    dest: /var/www/mediawiki/LocalSettings.php
+  when: "'mediawiki-node1' in inventory_hostname"
+  
+- name: Копируем файл LocalSettings на удаленный веб-сервер
+  copy:
+    src: /home/kongorg/ansible/LocalSettings_node2.php    # note the '/' <-- !!!
+    dest: /var/www/mediawiki/LocalSettings.php
+  when: "'mediawiki-node2' in inventory_hostname"
+  
+- name: Копируем файл mediawiki на удаленный веб-сервер
+  copy:
+    src: /home/kongorg/ansible/mediawiki    # note the '/' <-- !!!
+    dest: /etc/nginx/sites-available/
   notify: "Nginx Reloader"
-
+  
+- name: символьная ссылка
+  ansible.builtin.command: "{{ item }}"
+  with_items:
+    - sudo ln -s /etc/nginx/sites-available/mediawiki /etc/nginx/sites-enabled/
+  notify: "Nginx Reloader"
+  failed_when: false

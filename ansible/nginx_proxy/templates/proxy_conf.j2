@@ -1,12 +1,16 @@
 upstream backend {
-    server 158.160.110.118:80;
-    server 158.160.106.152:80;
+    server 192.168.10.40;
+    server 192.168.10.29;
+#    server 158.160.106.246;
+#    server 89.169.145.187;
 }
 
 server {
-    listen 3000;
+    listen 80;
+    server_name 192.168.10.33;
     location / {
         proxy_pass http://backend;
+        proxy_set_header Host $host;
     }
 }
 

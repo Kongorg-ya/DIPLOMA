@@ -1,2 +1,10 @@
 ---
 # vars file for nginx_custom
+packages_to_install:
+  - nginx
+  - php-fpm
+  - php-pgsql
+  - php-intl
+  - php-gd
+  - php-xml
+  - php-mbstring

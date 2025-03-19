@@ -6,3 +6,10 @@
     state: restarted
     enabled: yes
   listen: "Nginx Reloader" 
+  
+- name: PSQL Reloader
+  ansible.builtin.service:
+    name: postgresql
+    state: restarted
+    enabled: yes
+  listen: "PSQL Reloader" 

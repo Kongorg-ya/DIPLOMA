@@ -8,7 +8,6 @@
       Enter it again: "12345678"
   when: "'postgresql-master' in inventory_hostname"
   failed_when: false
-#  notify: "PSQL Reloader"
 
 - name: Останавливаем сервис и удаляем базы из папки хранения на ноде репликации
   ansible.builtin.command: "{{ item }}"

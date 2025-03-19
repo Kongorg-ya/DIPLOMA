@@ -36,4 +36,19 @@
   when: "'postgresql-master' in inventory_hostname"
   notify: "PSQL Reloader" 
   
+- name: настройка postgresql - создание пользователя для БД медиавики
+  ansible.builtin.expect:
+    command: sudo -u postgres createuser -S -D -R -P -E wikiuser
+    responses:
+      Enter password for new role: "12345678"
+      Enter it again: "12345678"
+  when: "'postgresql-master' in inventory_hostname"
+  failed_when: false
+  
+- name: Создаем БД и выдаем права на БД пользователю
+  ansible.builtin.command: "{{ item }}"
+  with_items:
+    - sudo -u postgres createdb -O wikiuser my_wiki
+  when: "'postgresql-master' in inventory_hostname"
+  failed_when: false
 
