@@ -1,0 +1,13 @@
+---
+# tasks file for mwfinal
+- name: Копируем файл LocalSettings на удаленный веб-сервер
+  copy:
+    src: /home/kongorg/ansible/LocalSettings_node1.php    # note the '/' <-- !!!
+    dest: /var/www/mediawiki/LocalSettings.php
+  when: "'mediawiki-node1' in inventory_hostname"
+ 
+- name: Копируем файл LocalSettings на удаленный веб-сервер
+  copy:
+    src: /home/kongorg/ansible/LocalSettings_node2.php    # note the '/' <-- !!!
+    dest: /var/www/mediawiki/LocalSettings.php
+  when: "'mediawiki-node2' in inventory_hostname"

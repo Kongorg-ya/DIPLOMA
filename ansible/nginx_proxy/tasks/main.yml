@@ -4,6 +4,12 @@
   shell: "echo {{ inventory_hostname }} > /etc/hostname"
   when: "inventory_hostname != ansible_hostname"
 
+- name: Обновление пакетов
+  ansible.builtin.command: "{{ item }}"
+  with_items:
+    - sudo apt-get update -y
+  failed_when: false
+
 - name: установка nginx
   apt:
     name: "nginx"

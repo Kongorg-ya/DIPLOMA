@@ -1,13 +1,13 @@
 server {
     listen 80;
-    server_name 158.160.112.79;
-    server_name 192.168.10.40;
+    server_name 158.160.57.149; #1 node
+    server_name 192.168.10.3;
     
-    server_name 158.160.45.6;
-    server_name 192.168.10.29;
+    server_name 89.169.156.118; # 2 node
+    server_name 192.168.10.34;
     
-    server_name 158.160.61.58; #balance
-    server_name 192.168.10.33;
+    server_name 158.160.62.236; #balance
+    server_name 192.168.10.6;
     
 
     root /var/www/mediawiki;

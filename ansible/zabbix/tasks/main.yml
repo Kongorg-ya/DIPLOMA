@@ -1,0 +1,111 @@
+---
+# tasks file for zabbix
+- name: Меняем имя машины
+  shell: "echo {{ inventory_hostname }} > /etc/hostname"
+  when: "inventory_hostname != ansible_hostname"
+  
+- name: Обновление пакетов
+  ansible.builtin.command: "{{ item }}"
+  with_items:
+    - sudo apt-get update -y
+  failed_when: false
+  
+- name: Установка репозитория Zabbix
+  ansible.builtin.command: "{{ item }}"
+  with_items:
+    - wget https://repo.zabbix.com/zabbix/7.2/release/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest_7.2+ubuntu22.04_all.deb
+    - dpkg -i zabbix-release_latest_7.2+ubuntu22.04_all.deb
+    - apt update
+  #failed_when: false
+
+- name: Установка Zabbix и необходимых пакетов
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - "{{ packages_to_install }}"
+
+- name: update mysql root password for root account
+  mysql_user:
+    name: root
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    host: 'localhost'
+    password: 12345678
+    priv: "*.*:ALL,GRANT"
+    #check_implicit_admin: true
+  failed_when: false
+    
+- name: Создаем Zabbix database
+  mysql_db:
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    login_user: root
+    login_password: 12345678
+    name: zabbix
+    encoding: utf8
+    collation: utf8_bin
+    state: present
+
+- name: Create Zabbix user
+  mysql_user:
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    login_user: root
+    login_password: 12345678
+    name: zabbix
+    host: localhost
+    password: 12345678
+    priv: "zabbix.*:ALL"
+    state: present
+    append_privs: yes
+    
+- name: Importing databases
+  mysql_db:
+    name: zabbix
+    login_user: root
+    login_host: localhost
+    login_password: 12345678
+    config_file: no
+    state: import
+    encoding: utf8
+    collation: utf8_bin
+    target: "/usr/share/zabbix/sql-scripts/mysql/server.sql.gz"
+  failed_when: false
+
+- name: Edit line db_password for zabbix-server
+  lineinfile:
+    path: /etc/zabbix/zabbix_server.conf
+    state: present
+    regexp: '^DBPassword='
+    line: 'DBPassword=12345678'
+
+- name: Копируем файлы nginx.conf
+  copy:
+    src: /home/kongorg/ansible/nginx_zabbix.conf  # note the '/' <-- !!!
+    dest: /etc/zabbix/nginx.conf
+  notify: "zabbix"
+  
+- name: Копируем файлы default
+  copy:
+    src: /home/kongorg/ansible/default_zabbix  # note the '/' <-- !!!
+    dest: /etc/nginx/sites-enabled/default
+  notify: "zabbix"
+
+- name: Open necessary firewall ports for Zabbix, PostgreSQL, and Apache
+#  firewalld:
+#    port: "{{ item }}"
+#    permanent: yes
+#    state: enabled
+#  with_items:
+#    - "10050/tcp"  # Zabbix server port
+#    - "10051/tcp"  # Zabbix server port
+#    - "5432/tcp"   # PostgreSQL port
+#    - "443/tcp"    # HTTPS/SSL port for Apache
+  ansible.builtin.command: "{{ item }}"
+  with_items:
+    - sudo ufw allow 10050/tcp
+    - sudo ufw allow 10051/tcp
+    - sudo ufw allow 5432/tcp
+    - sudo ufw allow 80/tcp
+    - sudo ufw reload
+  #notify: "FW Reloader"
+
+

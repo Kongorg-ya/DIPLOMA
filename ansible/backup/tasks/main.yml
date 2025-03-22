@@ -1,0 +1,56 @@
+---
+# tasks file for backup
+- name: Меняем имя машины
+  shell: "echo {{ inventory_hostname }} > /etc/hostname"
+  when: "inventory_hostname != ansible_hostname"
+  
+- name: Обновление пакетов
+  ansible.builtin.command: "{{ item }}"
+  with_items:
+    - sudo apt-get update -y
+  failed_when: false
+  
+- name: Установка Samba
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - "{{ packages_to_install }}"
+    
+- name: Создаем пользователя 
+  user:
+    name: backupfs
+    password: "{ {  pwd | password_hash('sha512') } }"
+  vars:
+    pwd: "backupfs"
+
+- name: Добавялем созданного пользователя в базу данных samba
+  ansible.builtin.expect:
+    command: sudo smbpasswd -a backupfs
+    responses:
+      New SMB password: "backupfs"
+      Retype new SMB password: "backupfs"
+
+- name: Копируем конфиг по-умолчанию и создаем структуру директорий для бэкапа
+  ansible.builtin.command: "{{ item }}"
+  with_items:
+    - sudo cp /etc/samba/smb.conf /etc/samba/smb_bak.conf
+    - mkdir -p /home/backupfs/FS/daily
+    - chown backupfs:backupfs /home/backupfs/FS/daily
+    - mkdir -p /home/backupfs/FS/weekly
+    - chown backupfs:backupfs /home/backupfs/FS/weekly
+    - mkdir -p /home/backupfs/FS/archive
+    - chown backupfs:backupfs /home/backupfs/FS/archive
+    - mkdir -p /home/backupfs/DB/daily
+    - chown backupfs:backupfs /home/backupfs/DB/daily
+    - mkdir -p /home/backupfs/DB/weekly
+    - chown backupfs:backupfs /home/backupfs/DB/weekly
+    - mkdir -p /home/backupfs/DB/archive
+    - chown backupfs:backupfs /home/backupfs/DB/archive  
+  failed_when: false
+  
+- name: Копируем smb.conf на удаленный веб-сервер
+  copy:
+    src: /home/kongorg/ansible/smb.conf    # note the '/' <-- !!!
+    dest: /etc/samba/
+  notify: "Samba Reloader"

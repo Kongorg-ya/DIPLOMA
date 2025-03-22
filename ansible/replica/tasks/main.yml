@@ -18,7 +18,7 @@
 
 - name: настройка postgresql - создание репликации
   ansible.builtin.expect:
-    command: sudo -u postgres pg_basebackup -h 192.168.10.15 -D /var/lib/postgresql/14/main -U syncuser -P -v -R
+    command: sudo -u postgres pg_basebackup -h 192.168.10.7 -D /var/lib/postgresql/14/main -U syncuser -P -v -R
     responses:
       Password: "12345678"
   when: "'postgresql-slave' in inventory_hostname"

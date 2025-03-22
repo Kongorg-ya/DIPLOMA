@@ -4,6 +4,12 @@
   shell: "echo {{ inventory_hostname }} > /etc/hostname"
   when: "inventory_hostname != ansible_hostname"
 
+- name: Обновление пакетов
+  ansible.builtin.command: "{{ item }}"
+  with_items:
+    - sudo apt-get update -y
+  failed_when: false
+  
 - name: установка postgresql
   apt:
     name: "postgresql"
@@ -31,9 +37,9 @@
   
 - name: настройка pg_hba.conf на мастер ноде
   ansible.builtin.template:
-    src: pg_hba_conf.j2
+    src: pg_hba_conf_master.j2
     dest: /etc/postgresql/14/main/pg_hba.conf
-  when: "'postgresql-master' in inventory_hostname"
+  #when: "'postgresql-master' in inventory_hostname"
   notify: "PSQL Reloader" 
   
 - name: настройка postgresql - создание пользователя для БД медиавики
@@ -51,4 +57,21 @@
     - sudo -u postgres createdb -O wikiuser my_wiki
   when: "'postgresql-master' in inventory_hostname"
   failed_when: false
+  
+- name: установка cifs-utils
+  apt:
+    name: "cifs-utils"
+    state: present
+  #when: "'postgresql-master' in inventory_hostname"
 
+- name: добавление строки в fstab адрес файлового сервера
+  lineinfile:
+    dest: /etc/fstab
+    line: //192.168.10.38/backupfs /mnt cifs user,rw,noauto,credentials=/root/.smbclient 0 0
+  #when: "'postgresql-master' in inventory_hostname"
+  
+- name: копируем файл с паролем для сетевой папки
+  copy:
+    src: /home/kongorg/ansible/smbclient    # note the '/' <-- !!!
+    dest: /root/.smbclient
+  #when: "'postgresql-master' in inventory_hostname"

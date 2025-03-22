@@ -1,0 +1,29 @@
+---
+# tasks file for backupdb
+- name: Монтируем сетевую папку хранения бэкапов
+  ansible.builtin.command: "{{ item }}"
+  with_items:
+    - mount /mnt
+    - mkdir /root/script
+  failed_when: false
+  when: "'postgresql-master' in inventory_hostname"
+
+- name: Копируем скрипт создания бэкапа на удаленный веб-сервер
+  copy:
+    src: /home/kongorg/ansible/backupdb.sh    # note the '/' <-- !!!
+    dest: /root/script/
+  when: "'postgresql-master' in inventory_hostname"
+
+- name: Делаем скрипт исполняемым
+  ansible.builtin.command: "{{ item }}"
+  with_items:
+    - chmod +x /root/script/backupdb.sh
+  when: "'postgresql-master' in inventory_hostname"
+    
+- name: Задача на выполнение скрипта каждый день в 7 утра
+  cron:
+    name: "backup"
+    minute: "0"
+    hour: "7"
+    job: "sh /root/script/backupdb.sh"
+  when: "'postgresql-master' in inventory_hostname"

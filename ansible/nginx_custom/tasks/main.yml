@@ -31,19 +31,7 @@
     - sudo chmod -R 755 /var/www/mediawiki
   failed_when: false
   
-- name: Копируем файл LocalSettings на удаленный веб-сервер
-  copy:
-    src: /home/kongorg/ansible/LocalSettings_node1.php    # note the '/' <-- !!!
-    dest: /var/www/mediawiki/LocalSettings.php
-  when: "'mediawiki-node1' in inventory_hostname"
-  
-- name: Копируем файл LocalSettings на удаленный веб-сервер
-  copy:
-    src: /home/kongorg/ansible/LocalSettings_node2.php    # note the '/' <-- !!!
-    dest: /var/www/mediawiki/LocalSettings.php
-  when: "'mediawiki-node2' in inventory_hostname"
-  
-- name: Копируем файл mediawiki на удаленный веб-сервер
+- name: Копируем файл сетевый настроек mediawiki на удаленный веб-сервер
   copy:
     src: /home/kongorg/ansible/mediawiki    # note the '/' <-- !!!
     dest: /etc/nginx/sites-available/
@@ -55,3 +43,21 @@
     - sudo ln -s /etc/nginx/sites-available/mediawiki /etc/nginx/sites-enabled/
   notify: "Nginx Reloader"
   failed_when: false
+
+- name: установка cifs-utils
+  apt:
+    name: "cifs-utils"
+    state: present
+  when: "'mediawiki-node1' in inventory_hostname"
+
+- name: добавление строки в fstab
+  lineinfile:
+    dest: /etc/fstab
+    line: //192.168.10.38/backupfs /mnt cifs user,rw,noauto,credentials=/root/.smbclient 0 0
+  when: "'mediawiki-node1' in inventory_hostname"
+  
+- name: копируем файл с паролем для сетевой папки
+  copy:
+    src: /home/kongorg/ansible/smbclient    # note the '/' <-- !!!
+    dest: /root/.smbclient
+  when: "'mediawiki-node1' in inventory_hostname"

@@ -21,8 +21,8 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 ## Uncomment this to disable output compression
 # $wgDisableOutputCompression = true;
 
-$wgSitename = 'Yandex DIPLOM';
-$wgMetaNamespace = 'Yandex_DIPLOM';
+$wgSitename = 'Dipom YANDEX';
+$wgMetaNamespace = 'Dipom_YANDEX';
 
 ## The URL base path to the directory containing the wiki;
 ## defaults for all runtime URL paths are based off of this.
@@ -32,7 +32,7 @@ $wgMetaNamespace = 'Yandex_DIPLOM';
 $wgScriptPath = '';
 
 ## The protocol and server name to use in fully-qualified URLs
-$wgServer = 'http://158.160.112.79';
+$wgServer = 'http://158.160.57.149';
 
 ## The URL path to static resources (images, scripts, etc.)
 $wgResourceBasePath = $wgScriptPath;
@@ -41,7 +41,7 @@ $wgResourceBasePath = $wgScriptPath;
 ## or else you'll overwrite your logo when you upgrade!
 $wgLogos = [
 	'1x' => "$wgResourceBasePath/resources/assets/change-your-logo.svg",
-	'icon' => "$wgResourceBasePath/resources/assets/change-your-logo-icon.svg",
+	'icon' => "$wgResourceBasePath/resources/assets/change-your-logo.svg",
 ];
 
 ## UPO means: this is also a user preference option
@@ -58,7 +58,7 @@ $wgEmailAuthentication = true;
 
 ## Database settings
 $wgDBtype = 'postgres';
-$wgDBserver = '192.168.10.15';
+$wgDBserver = '192.168.10.7';
 $wgDBname = 'my_wiki';
 $wgDBuser = 'wikiuser';
 $wgDBpassword = '12345678';
@@ -91,7 +91,7 @@ $wgUseInstantCommons = false;
 $wgPingback = true;
 
 # Site language code, should be one of the list in ./includes/languages/data/Names.php
-$wgLanguageCode = 'ru';
+$wgLanguageCode = 'en';
 
 # Time zone
 $wgLocaltimezone = 'UTC';
@@ -101,14 +101,14 @@ $wgLocaltimezone = 'UTC';
 ## be publicly accessible from the web.
 #$wgCacheDirectory = "$IP/cache";
 
-$wgSecretKey = 'efc8c3d7aa832efb143fb8726e1b8589c16abc28d90a81728bd237487b85809b';
+$wgSecretKey = 'c4c049e71b010a7a618c56eda8955fa14f619c862b2d30cdcd1f385e74c812be';
 
 # Changing this will log out all existing sessions.
 $wgAuthenticationTokenVersion = '1';
 
 # Site upgrade key. Must be set to a string (default provided) to turn on the
 # web installer while LocalSettings.php is in place
-$wgUpgradeKey = 'e11b4bf5b74e2bd7';
+$wgUpgradeKey = 'f9dff618e9f80f00';
 
 ## For attaching licensing metadata to pages, and displaying an
 ## appropriate copyright notice / icon. GNU Free Documentation
@@ -123,7 +123,7 @@ $wgDiff3 = '/usr/bin/diff3';
 
 ## Default skin: you can change the default skin. Use the internal symbolic
 ## names, e.g. 'vector' or 'monobook':
-$wgDefaultSkin = 'vector-2022';
+$wgDefaultSkin = 'monobook';
 
 # Enabled skins.
 # The following skins were automatically enabled:

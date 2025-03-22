@@ -1,0 +1,4 @@
+---
+# vars file for backup
+packages_to_install:
+  - samba

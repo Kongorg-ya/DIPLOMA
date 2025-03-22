@@ -26,3 +26,45 @@
     - role: replica
   tags:
     - replica
+
+- name: Настройка файлового сервера хранения бэкапов
+  hosts: backup
+  roles:
+    - role: backup
+  tags:
+    - backup
+
+- name: Настройка расписания выполнения скрипта бэкапа приложения
+  hosts: nginx_custom
+  roles:
+    - role: backup_fs
+  tags:
+    - backupfs
+
+- name: Настройка расписания выполнения скрипта бэкапа БД
+  hosts: psql_cluster
+  roles:
+    - role: backupdb
+  tags:
+    - backupdb
+
+- name: копирование файла Localsettings на хосты приложения
+  hosts: nginx_custom
+  roles:
+    - role: mwfinal
+  tags:
+    - mwfinal
+
+- name: установка zabbix сервера
+  hosts: zabbix
+  roles:
+    - role: zabbix
+  tags:
+    - zabbix
+    
+- name: установка zabbix агентов
+  hosts: all
+  roles:
+    - role: zabbix-agent
+  tags:
+    - zabbix-agent

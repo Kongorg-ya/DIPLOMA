@@ -1,0 +1,29 @@
+---
+# tasks file for backup_fs on nginx-custom hosts
+- name: Монтируем сетевую папку хранения бэкапов
+  ansible.builtin.command: "{{ item }}"
+  with_items:
+    - mount /mnt
+    - mkdir /root/script
+  #failed_when: false
+  when: "'mediawiki-node1' in inventory_hostname"
+
+- name: Копируем скрипт на удаленный веб-сервер
+  copy:
+    src: /home/kongorg/ansible/backupfs.sh    # note the '/' <-- !!!
+    dest: /root/script/
+  when: "'mediawiki-node1' in inventory_hostname"
+
+- name: Делаем скрипт исполняемым
+  ansible.builtin.command: "{{ item }}"
+  with_items:
+    - chmod +x /root/script/backupfs.sh
+  when: "'mediawiki-node1' in inventory_hostname"
+    
+- name: Задача на выполнение скрипта каждый день в 5 утра
+  cron:
+    name: "backup fs"
+    minute: "0"
+    hour: "5"
+    job: "sh /root/script/backupfs.sh"
+  when: "'mediawiki-node1' in inventory_hostname"

@@ -1,0 +1,28 @@
+---
+# tasks file for zabbix-agent
+- name: Обновление пакетов
+  ansible.builtin.command: "{{ item }}"
+  with_items:
+    - sudo apt-get update -y
+  when: "not 'zabbix' in inventory_hostname"
+  failed_when: false
+  
+- name: Установка zabbix-agent на все хосты кроме сервера
+  apt:
+    name: "zabbix-agent"
+    state: present
+  when: "not 'zabbix' in inventory_hostname"
+  
+- name: Configuring zabbix-agent
+  ansible.builtin.template:
+    src: zabbix_agentd.conf.j2
+    dest: /etc/zabbix/zabbix_agentd.conf
+  when: "not 'zabbix' in inventory_hostname"
+
+- name: Restarting and enabling zabbix-agent
+  ansible.builtin.service:
+    name: zabbix-agent
+    state: restarted
+    enabled: yes
+  when: "not 'zabbix' in inventory_hostname"
+

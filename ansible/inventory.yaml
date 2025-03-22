@@ -4,27 +4,28 @@ linux: #Группа хостов
     nginx_proxy: #Имя подгруппы хостов балансировщика
       hosts: #Узлы группы
         balance-server: #Имя машины
-          ansible_host: 158.160.61.58 #Адрес машины
+          ansible_host: 158.160.62.236 #Адрес машины
     nginx_custom: #Имя подгруппы хостов серверов приложения
       hosts: #Узлы группы
         mediawiki-node1:
-          ansible_host: 158.160.112.79
+          ansible_host: 158.160.57.149
         mediawiki-node2:
-          ansible_host: 158.160.45.6
+          ansible_host: 89.169.156.118
     psql_cluster: #Имя подгруппы хостов кластера БД
       hosts: #Узлы группы
         postgresql-master:
-          ansible_host: 51.250.10.77
+          ansible_host: 158.160.47.100
         postgresql-slave:
-          ansible_host: 158.160.112.182
+          ansible_host: 158.160.34.246
     monitoring: #Имя подгруппы хостов мониторинга
       hosts: #Узлы группы
         zabbix:
-          ansible_host: 158.160.109.140
+          ansible_host: 84.252.129.47
+          ansible_python_interpreter: "{{ ansible_playbook_python }}" 
     backup: #Имя подгруппы хостов мониторинга
       hosts: #Узлы группы
         backup-fs:
-          ansible_host: 158.160.103.50
+          ansible_host: 89.169.130.89
 
 
   vars: #Переменные, доступные или используемые для всех подгрупп
